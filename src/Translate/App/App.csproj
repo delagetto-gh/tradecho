@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Components\Api\Api.csproj" />
+    <ProjectReference Include="..\Components\Publisher\Publisher.csproj" />
+    <ProjectReference Include="..\Components\Subscriber\Subscriber.csproj" />
+    <ProjectReference Include="..\Core\Application\Application.csproj" />
+    <ProjectReference Include="..\Core\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

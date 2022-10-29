@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradecho</title>
+</head>
+
+<body>
+    <input type="text" id="input-word">
+    <button type="submit" id="btn-echo"> Echo </button>
+
+    <table>
+        <thead>
+            <th>Word</th>
+            <th>Translated</th>
+            <th>Translated Language</th>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+    </table>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.10/signalr.js"></script>
+<script>
+
+    var connection;
+
+    const inputWord = document.getElementById("input-word");
+
+    const echoButton = document.getElementById("btn-echo");
+    echoButton.disabled = true;
+
+    echoButton.addEventListener("click", async () => {
+        await fetchAsync(`http://localhost:5000/${inputWord.value}/echo`)
+    });
+
+    async function fetchAsync(url) {
+        return fetch(url, { method: "POST" });
+    }
+
+    const tableBody = document.getElementById("table-body");
+
+    let startSignalRConnection = async () => {
+
+        connection = new signalR
+            .HubConnectionBuilder()
+            .withUrl("http://localhost:7000/notifications")
+            .build();
+
+        connection.on("notification", (message) => {
+
+            const word = document.createElement("td");
+            word.innerText = message.word;
+
+            const translation = document.createElement("td");
+            translation.innerText = message.translation;
+
+            const translationLanguage = document.createElement("td");
+            translationLanguage.innerText = message.translationLanguage;
+
+            const newTableRow = document.createElement("tr");
+            newTableRow.appendChild(word);
+            newTableRow.appendChild(translation);
+            newTableRow.appendChild(translationLanguage);
+
+            tableBody.appendChild(newTableRow);
+
+            console.log({ status: "new notification", message });
+        });
+
+        await connection.start();
+        echoButton.disabled = false;
+    }
+
+    startSignalRConnection();
+
+</script>
+
+</html>

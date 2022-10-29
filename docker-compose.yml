@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  echo-service:
+    container_name: echo-service
+    build:
+      context: .
+      dockerfile: src/Echo/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    ports:
+      - "8080:80"
+    environment:
+      - ConnectionStrings__db=Host=postgres;Username=postgres;Password=postgres;Database=echo
+    networks:
+      - app-network
+      
+  translate-service:
+    container_name: translate-service
+    build:
+      context: .
+      dockerfile: src/Translate/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - ConnectionStrings__db=Host=postgres;Username=postgres;Password=postgres;Database=translate
+    networks:
+      - app-network
+
+
+  notifications-service:
+    container_name: notifications-service
+    build:
+      context: .
+      dockerfile: src/Notifications/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    # environment:
+    #   - ConnectionStrings__db=Host=postgres;Username=postgres;Password=postgres;Database=translate
+    networks:
+      - app-network      
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - app-network
+
+  rabbitmq:
+    hostname: rabbitmq
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "8081:15672"
+      - "5672:5672"
+    networks:
+      - app-network
+
+networks:
+  app-network:
